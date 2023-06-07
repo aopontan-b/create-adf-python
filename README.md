@@ -6,6 +6,13 @@
 git clone https://github.com/aopontan-b/create-adf-python.git
 cd create-adf-python
 ```
+
+環境変数の設定ファイルの作成
+```
+cp cp .env.sample .env
+```
+この[リンク](https://learn.microsoft.com/ja-jp/azure/active-directory/develop/howto-create-service-principal-portal#register-an-application-with-azure-ad-and-create-a-service-principal)に従って、アプリケーション (クライアント) ID、クライアント シークレット値、およびテナント ID を取得し、.envに書き込む
+
 ### 仮想環境の生成
 仮想環境を生成するには二つの方法がある
 
