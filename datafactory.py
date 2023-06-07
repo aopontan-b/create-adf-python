@@ -3,7 +3,8 @@ from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.datafactory import DataFactoryManagementClient
 from azure.mgmt.datafactory.models import *
 from datetime import datetime, timedelta
-import time
+import time, os
+from dotenv import load_dotenv
 
 def print_item(group):
     """Print an Azure object instance."""
@@ -37,17 +38,24 @@ def print_activity_run_details(activity_run):
 
 def main():
 
+    load_dotenv()
+
     # Azure subscription ID
-    subscription_id = '<subscription ID>'
+    subscription_id = os.getenv("AZURE_SUBSCRIPTION_ID")
+    client_id = os.getenv("AZURE_CLIENT_ID")
+    client_secret = os.getenv("AZURE_CLIENT_SECRET")
+    tenant_id = os.getenv("AZURE_TENANT_ID")
 
     # This program creates this resource group. If it's an existing resource group, comment out the code that creates the resource group
-    rg_name = '<resource group>'
+    # rg_name = '<resource group>'
+    rg_name = 'quickstart-create-data-factory-python'
 
     # The data factory name. It must be globally unique.
-    df_name = '<factory name>'
+    # df_name = '<factory name>'
+    df_name = 'aopontanADF'
 
     # Specify your Active Directory client ID, client secret, and tenant ID
-    credentials = ClientSecretCredential(client_id='<service principal ID>', client_secret='<service principal key>', tenant_id='<tenant ID>') 
+    credentials = ClientSecretCredential(tenant_id, client_id, client_secret)
     resource_client = ResourceManagementClient(credentials, subscription_id)
     adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
@@ -56,7 +64,7 @@ def main():
  
     # create the resource group
     # comment out if the resource group already exits
-    resource_client.resource_groups.create_or_update(rg_name, rg_params)
+    # resource_client.resource_groups.create_or_update(rg_name, rg_params)
 
     # Create a data factory
     df_resource = Factory(location='westus')
@@ -68,9 +76,10 @@ def main():
 
     # Create an Azure Storage linked service
     ls_name = 'storageLinkedService001'
+    conn_str = os.getenv("AZURE_STORAGE_ACCOUNT_CONN")
 
     # IMPORTANT: specify the name and key of your Azure Storage account.
-    storage_string = SecureString(value='DefaultEndpointsProtocol=https;AccountName=<account name>;AccountKey=<account key>;EndpointSuffix=<suffix>')
+    storage_string = SecureString(value=conn_str)
 
     ls_azure_storage = LinkedServiceResource(properties=AzureStorageLinkedService(connection_string=storage_string)) 
     ls = adf_client.linked_services.create_or_update(rg_name, df_name, ls_name, ls_azure_storage)
@@ -79,8 +88,8 @@ def main():
     # Create an Azure blob dataset (input)
     ds_name = 'ds_in'
     ds_ls = LinkedServiceReference(reference_name=ls_name)
-    blob_path = '<container>/<folder path>'
-    blob_filename = '<file name>'
+    blob_path = 'adfv2tutorial/input'
+    blob_filename = 'input.txt'
     ds_azure_blob = DatasetResource(properties=AzureBlobDataset(
         linked_service_name=ds_ls, folder_path=blob_path, file_name=blob_filename))
     ds = adf_client.datasets.create_or_update(
@@ -89,7 +98,7 @@ def main():
 
     # Create an Azure blob dataset (output)
     dsOut_name = 'ds_out'
-    output_blobpath = '<container>/<folder path>'
+    output_blobpath = 'adfv2tutorial/output'
     dsOut_azure_blob = DatasetResource(properties=AzureBlobDataset(linked_service_name=ds_ls, folder_path=output_blobpath))
     dsOut = adf_client.datasets.create_or_update(
         rg_name, df_name, dsOut_name, dsOut_azure_blob)
