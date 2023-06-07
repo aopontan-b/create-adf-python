@@ -50,3 +50,4 @@ python3 datafactory.python
 
 ## 参考記事
 - [クイック スタート:Python を使用してデータ ファクトリとパイプラインを作成する](https://learn.microsoft.com/ja-jp/azure/data-factory/quickstart-create-data-factory-python)
+- [Microsoft Azure SDK for Python](https://learn.microsoft.com/ja-jp/python/api/overview/azure/mgmt-datafactory-readme?source=recommendations&view=azure-python)
