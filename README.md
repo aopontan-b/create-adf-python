@@ -45,7 +45,7 @@ python -m pip install -r requirements.txt
 
 ## Data Factory の構築
 ```
-python3 datafactory.python
+python3 datafactory.py
 ```
 
 ## 参考記事
